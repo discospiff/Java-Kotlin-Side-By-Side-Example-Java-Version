@@ -3,7 +3,6 @@ package edu.uc.jonesbr.myapplication;
 import android.os.Bundle;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
-import com.google.android.material.snackbar.Snackbar;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
@@ -21,8 +20,13 @@ import android.widget.Toast;
 import java.util.ArrayList;
 import java.util.List;
 
+import edu.uc.jonesbr.myapplication.dao.IFoodDAO;
+import edu.uc.jonesbr.myapplication.dao.RetrofitClientInstance;
 import edu.uc.jonesbr.myapplication.dto.Food;
 import edu.uc.jonesbr.myapplication.dto.FoodType;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -114,6 +118,22 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void fetchFoodTypes() {
+        IFoodDAO foodDAO = RetrofitClientInstance.getRetrofitInstance().create(IFoodDAO.class);
+        Call<List<FoodType>> call = foodDAO.getFoodTypes();
+        call.enqueue(new Callback<List<FoodType>>() {
+            @Override
+            public void onResponse(Call<List<FoodType>> call, Response<List<FoodType>> response) {
+                List<FoodType> body = response.body();
+                ArrayAdapter<FoodType> adapter = new ArrayAdapter<FoodType>(MainActivity.this, android.R.layout.simple_list_item_1, body);
+                actType.setAdapter(adapter);
+
+            }
+
+            @Override
+            public void onFailure(Call<List<FoodType>> call, Throwable t) {
+
+            }
+        });
     }
 
     private void updateSpinner() {
@@ -123,7 +143,6 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.menu_main, menu);
         return true;
     }
@@ -133,18 +152,19 @@ public class MainActivity extends AppCompatActivity {
         food.setCost(edtCost.getText().toString());
         food.setPrepTime(edtPrepTime.getText().toString());
         food.setType(actType.getText().toString());
+        int tempCalories = 0;
+        if (edtCalories.getText().toString().trim().length() > 0) {
+            tempCalories = Integer.parseInt(edtCalories.getText().toString());
+        }
+        food.setCalories(tempCalories);
         allFoods.add(food);
         food = new Food();
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
 
-        //noinspection SimplifiableIfStatement
         if (id == R.id.action_settings) {
             return true;
         }
