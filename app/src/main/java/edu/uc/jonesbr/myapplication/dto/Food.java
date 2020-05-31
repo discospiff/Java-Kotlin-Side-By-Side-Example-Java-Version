@@ -6,7 +6,29 @@ public class Food {
     private int calories;
     private String cost;
     private String prepTime;
-    private String type;
+    private String type = "Undefined";
+
+    public Food() {
+
+    }
+
+    public Food(String name) {
+        this.name = name;
+    }
+
+    public Food(String name, int calories, String cost, String prepTime) {
+        this.name = name;
+        this.calories = calories;
+        this.cost = cost;
+        this.prepTime = prepTime;
+    }
+
+    public Food(String name, int calories, String cost) {
+        this.name = name;
+        this.calories = calories;
+        this.cost = cost;
+    }
+
 
     public String getName() {
         return name;
